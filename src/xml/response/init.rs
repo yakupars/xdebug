@@ -1,5 +1,4 @@
 use quick_xml::de::from_str;
-use quick_xml::se::to_string;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -20,10 +19,10 @@ pub(crate) struct Init {
     pub appid: String,
     #[serde(rename = "@optional")]
     pub idekey: Option<String>,
-    pub engine: Engine,
-    pub author: Author,
-    pub url: Url,
-    pub copyright: Copyright,
+    engine: Engine,
+    author: Author,
+    url: Url,
+    copyright: Copyright,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -55,9 +54,5 @@ struct Copyright {
 impl Init {
     pub fn from_str(str: &str) -> Self {
         from_str(str).unwrap()
-    }
-
-    pub fn to_str(&self) -> String {
-        to_string(self).unwrap()
     }
 }

@@ -1,5 +1,4 @@
 use quick_xml::de::from_str;
-use quick_xml::se::to_string;
 use serde::{Deserialize, Serialize};
 use crate::xml::XdebugError;
 
@@ -10,7 +9,7 @@ pub enum FeatureSet {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-struct Success {
+pub struct Success {
     #[serde(rename = "@command")]
     pub command: String,
     #[serde(rename = "@transaction_id")]
@@ -22,7 +21,7 @@ struct Success {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-struct Error {
+pub struct Error {
     #[serde(rename = "@command")]
     pub command: String,
     #[serde(rename = "@transaction_id")]
@@ -37,25 +36,5 @@ impl FeatureSet {
         }
 
         FeatureSet::Error(from_str(str).unwrap())
-    }
-}
-
-impl Success {
-    fn from_str(str: &str) -> Self {
-        from_str(str).unwrap()
-    }
-
-    fn to_str(&self) -> String {
-        to_string(self).unwrap()
-    }
-}
-
-impl Error {
-    fn from_str(str: &str) -> Self {
-        from_str(str).unwrap()
-    }
-
-    fn to_str(&self) -> String {
-        to_string(self).unwrap()
     }
 }

@@ -16,7 +16,7 @@ impl XdebugConnection {
     pub async fn initialize() -> Option<XdebugConnection> {
         let listener = TcpListener::bind("0.0.0.0:9003").await.unwrap();
 
-        if let Ok((mut socket, addr)) = listener.accept().await {
+        if let Ok((socket, _)) = listener.accept().await {
             drop(listener);
 
             let (read_half, write_half) = socket.into_split();
@@ -69,7 +69,6 @@ impl XdebugConnection {
 
         command.push_str("\0");
 
-        println!("command: {:?}", command);
         self.writer.write_all(command.as_bytes()).await.unwrap()
     }
 
@@ -92,13 +91,10 @@ impl XdebugConnection {
     }
 
     async fn read_until(&mut self, delimiter: u8) -> String {
-        // let mut reader = BufReader::new(read_half);
         let mut read_until_buffer = Vec::new();
 
         // get the size of xml to read
         self.reader.read_until(delimiter, &mut read_until_buffer).await.unwrap();
-
-        // println!("read_until_buffer: {:?}", std::str::from_utf8(&read_until_buffer).unwrap());
 
         // // remove null byte in the end
         read_until_buffer.remove(read_until_buffer.len() - 1);
