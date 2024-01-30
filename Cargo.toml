@@ -1,6 +1,6 @@
 [package]
 name = "xdebug"
-version = "0.2.1"
+version = "0.3.0"
 authors = ["Yakup Arslan"]
 edition = "2021"
 description = "PHP xdebug client library"
@@ -14,4 +14,4 @@ keywords = ["PHP", "xdebug"]
 [dependencies]
 tokio = { version = "1.35.1", features = ["full"] }
 serde = { version = "1.0.196", features = ["derive"] }
-quick-xml = { version = "0.31.0", features = ["serialize"] }
+quick-xml = { version = "0.31.0", features = ["serialize", "overlapped-lists"] }

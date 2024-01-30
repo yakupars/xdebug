@@ -1,3 +1,9 @@
 pub(crate) mod init;
 pub(crate) mod feature_set;
 pub(crate) mod status;
+pub(crate) mod step_into;
+pub(crate) mod stack_get;
+pub(crate) mod context_names;
+pub(crate) mod context_get;
+pub(crate) mod run;
+pub(crate) mod detatch;

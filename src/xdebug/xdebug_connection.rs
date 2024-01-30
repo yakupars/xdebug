@@ -4,10 +4,13 @@ use tokio::net::tcp::{OwnedReadHalf, OwnedWriteHalf};
 use tokio::net::TcpListener;
 
 use crate::xml::response::init::Init;
-use crate::{FeatureSet, Status};
+use crate::{ContextGet, Detach, FeatureSet, Run, Status};
+use crate::xml::response::context_names::ContextNames;
+use crate::xml::response::stack_get::StackGet;
+use crate::xml::response::step_into::StepInto;
 
 pub struct XdebugConnection {
-    reader: BufReader<OwnedReadHalf>,
+    pub reader: BufReader<OwnedReadHalf>,
     writer: OwnedWriteHalf,
     transaction_id: i8,
 }
@@ -46,6 +49,52 @@ impl XdebugConnection {
         self.send_command("status", None).await;
 
         Status::from_str(self.read_response().await.as_str())
+    }
+
+    pub async fn step_into(&mut self) -> StepInto {
+        self.send_command("step_into", None).await;
+
+        StepInto::from_str(self.read_response().await.as_str())
+    }
+
+    pub async fn stack_get(&mut self) -> StackGet {
+        self.send_command("stack_get", None).await;
+
+        StackGet::from_str(self.read_response().await.as_str())
+    }
+
+    pub async fn run(&mut self) -> Run {
+        self.send_command("run", None).await;
+
+        Run::from_str(self.read_response().await.as_str())
+    }
+
+    pub async fn detach(&mut self) -> Detach {
+        self.send_command("detach", None).await;
+
+        Detach::from_str(self.read_response().await.as_str())
+    }
+
+    pub async fn context_names(&mut self) -> ContextNames {
+        self.send_command("context_names", None).await;
+
+        ContextNames::from_str(self.read_response().await.as_str())
+    }
+
+    pub async fn context_get(&mut self, depth: Option<&str>, context: Option<&str>) -> ContextGet {
+        let mut args = HashMap::new();
+
+        if let Some(depth) = depth {
+            args.insert("-d", depth);
+        }
+
+        if let Some(context) = context {
+            args.insert("-c", context);
+        }
+
+        self.send_command("context_get", Some(args)).await;
+
+        ContextGet::from_str(self.read_response().await.as_str())
     }
 
     async fn send_command(&mut self, command: &str, args: Option<HashMap<&str, &str>>) {

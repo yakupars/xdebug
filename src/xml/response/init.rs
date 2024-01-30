@@ -4,21 +4,21 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Serialize, Deserialize)]
 pub(crate) struct Init {
     #[serde(rename = "@xmlns")]
-    pub xmlns: String,
+    xmlns: String,
     #[serde(rename = "@xmlns:xdebug")]
-    pub xmlns_xdebug: String,
+    xmlns_xdebug: String,
     #[serde(rename = "@fileuri")]
-    pub fileuri: String,
+    fileuri: String,
     #[serde(rename = "@language")]
-    pub language: String,
+    language: String,
     #[serde(rename = "@language_version")]
-    pub xdebug_language_version: String,
+    xdebug_language_version: String,
     #[serde(rename = "@protocol_version")]
-    pub protocol_version: String,
+    protocol_version: String,
     #[serde(rename = "@appid")]
-    pub appid: String,
-    #[serde(rename = "@optional")]
-    pub idekey: Option<String>,
+    appid: String,
+    #[serde(rename = "@idekey")]
+    idekey: Option<String>,
     engine: Engine,
     author: Author,
     url: Url,
