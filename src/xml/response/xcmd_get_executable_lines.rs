@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use crate::xml::XdebugError;
 
 #[derive(Debug, Serialize, Deserialize)]
-pub enum StepInto {
+pub enum XcmdGetExecutableLines {
     Success(Success),
     Error(Error),
 }
@@ -14,31 +14,18 @@ pub struct Success {
     pub command: String,
     #[serde(rename = "@transaction_id")]
     pub transaction_id: i32,
-    #[serde(rename = "@status")]
-    pub status: String,
-    #[serde(rename = "@reason")]
-    pub reason: String,
-    pub message: Message,
-    pub return_value: Option<ReturnValue>,
+    pub lines: Lines,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct Message {
-    #[serde(rename = "@filename")]
-    pub filename: String,
+pub struct Lines {
+    pub line: Vec<Line>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Line {
     #[serde(rename = "@lineno")]
     pub lineno: i32,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct ReturnValue {
-    pub property: Property,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Property {
-    #[serde(rename = "$text")]
-    content: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -50,12 +37,12 @@ pub struct Error {
     error: XdebugError,
 }
 
-impl StepInto {
-    pub fn from_str(str: &str) -> StepInto {
+impl XcmdGetExecutableLines {
+    pub fn from_str(str: &str) -> XcmdGetExecutableLines {
         if let Ok(response) = from_str(str) {
-            return StepInto::Success(response);
+            return XcmdGetExecutableLines::Success(response);
         }
 
-        StepInto::Error(from_str(str).unwrap())
+        XcmdGetExecutableLines::Error(from_str(str).unwrap())
     }
 }

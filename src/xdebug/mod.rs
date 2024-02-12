@@ -1,1 +1,1 @@
-pub(crate) mod xdebug_connection;
+pub(crate) mod connection;

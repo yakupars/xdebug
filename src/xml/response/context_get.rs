@@ -22,9 +22,9 @@ pub struct Success {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Property {
     #[serde(rename = "@name")]
-    pub name: String,
+    pub name: Option<String>,
     #[serde(rename = "@fullname")]
-    pub fullname: String,
+    pub fullname: Option<String>,
     #[serde(rename = "@classname")]
     pub classname: Option<String>,
     #[serde(rename = "@page")]

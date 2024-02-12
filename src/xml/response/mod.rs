@@ -6,4 +6,6 @@ pub(crate) mod stack_get;
 pub(crate) mod context_names;
 pub(crate) mod context_get;
 pub(crate) mod run;
-pub(crate) mod detatch;
+pub(crate) mod detach;
+pub(crate) mod xcmd_get_executable_lines;
+pub(crate) mod breakpoint_set;

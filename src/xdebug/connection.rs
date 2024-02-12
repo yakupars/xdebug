@@ -1,23 +1,23 @@
 use std::collections::HashMap;
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use tokio::net::tcp::{OwnedReadHalf, OwnedWriteHalf};
-use tokio::net::TcpListener;
+use tokio::net::{TcpListener, ToSocketAddrs};
 
 use crate::xml::response::init::Init;
-use crate::{ContextGet, Detach, FeatureSet, Run, Status};
+use crate::{BreakpointSet, ContextGet, Detach, FeatureSet, Run, Status, XcmdGetExecutableLines};
 use crate::xml::response::context_names::ContextNames;
 use crate::xml::response::stack_get::StackGet;
 use crate::xml::response::step_into::StepInto;
 
-pub struct XdebugConnection {
+pub struct Connection {
     pub reader: BufReader<OwnedReadHalf>,
     writer: OwnedWriteHalf,
     transaction_id: i8,
 }
 
-impl XdebugConnection {
-    pub async fn initialize() -> Option<XdebugConnection> {
-        let listener = TcpListener::bind("0.0.0.0:9003").await.unwrap();
+impl Connection {
+    pub async fn initialize<A: ToSocketAddrs>(addr: A) -> Option<Connection> {
+        let listener = TcpListener::bind(addr).await.unwrap();
 
         if let Ok((socket, _)) = listener.accept().await {
             drop(listener);
@@ -25,21 +25,37 @@ impl XdebugConnection {
             let (read_half, write_half) = socket.into_split();
             let reader = BufReader::new(read_half);
 
-            let mut xdebug_connection = Self {
+            let mut connection = Self {
                 reader,
                 writer: write_half,
                 transaction_id: 0,
             };
 
-            xdebug_connection.read_init().await;
+            connection.read_init().await;
 
-            return Some(xdebug_connection);
+            return Some(connection);
         }
 
         None
     }
 
-    pub async fn set_feature(&mut self, name: &str, value: &str) -> FeatureSet {
+    pub async fn xcmd_get_executable_lines(&mut self, depth: &str) -> XcmdGetExecutableLines {
+        self.send_command("xcmd_get_executable_lines", Some(HashMap::from([("-d", depth)]))).await;
+
+        XcmdGetExecutableLines::from_str(self.read_response().await.as_str())
+    }
+
+    pub async fn breakpoint_set(&mut self, breakpoint_type: &str, lineno: &str
+                                , filename: &str
+    ) -> BreakpointSet {
+        self.send_command("breakpoint_set", Some(HashMap::from([("-t", breakpoint_type), ("-n", lineno)
+            , ("-f", filename)
+        ]))).await;
+
+        BreakpointSet::from_str(self.read_response().await.as_str())
+    }
+
+    pub async fn feature_set(&mut self, name: &str, value: &str) -> FeatureSet {
         self.send_command("feature_set", Some(HashMap::from([("-n", name), ("-v", value)]))).await;
 
         FeatureSet::from_str(self.read_response().await.as_str())
@@ -122,15 +138,15 @@ impl XdebugConnection {
     }
 
     async fn read_init(&mut self) -> Init {
-        let _xml_size = self.read_until(0x00).await;
-        let xml = self.read_until(0x00).await;
+        let _xml_size = self.read_until(0x0).await;
+        let xml = self.read_until(0x0).await;
 
         Init::from_str(xml.as_str())
     }
 
     async fn read_response(&mut self) -> String {
-        let _xml_size = self.read_until(0x00).await;
-        let xml = self.read_until(0x00).await;
+        let _xml_size = self.read_until(0x0).await;
+        let xml = self.read_until(0x0).await;
 
         xml
     }
