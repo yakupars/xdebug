@@ -18,7 +18,7 @@ pub struct Success {
     pub status: String,
     #[serde(rename = "@reason")]
     pub reason: String,
-    pub message: Message,
+    pub message: Option<Message>,
     pub return_value: Option<ReturnValue>,
 }
 
@@ -38,7 +38,7 @@ pub struct ReturnValue {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Property {
     #[serde(rename = "$text")]
-    content: String,
+    content: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

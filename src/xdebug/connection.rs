@@ -12,7 +12,7 @@ use crate::xml::response::step_into::StepInto;
 pub struct Connection {
     pub reader: BufReader<OwnedReadHalf>,
     writer: OwnedWriteHalf,
-    transaction_id: i8,
+    transaction_id: u16,
 }
 
 impl Connection {
